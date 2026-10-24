@@ -1,167 +1,155 @@
 import React from 'react';
-import { UserCheck, Award, Calendar, Compass, ShieldCheck, CheckCircle2, ArrowRight, Sparkles, Landmark, Phone } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Phone, UserCheck, Calendar, Compass, Award, ArrowUpRight } from 'lucide-react';
 import { contactInfo } from '../data/loanData';
+import { SectionHeading, Reveal, GoldButton, EASE } from './ui/Primitives';
+import { scrollToId } from '../lib/scroll';
+
+const pillars = [
+  { icon: UserCheck, label: 'Proprietorship', value: contactInfo.proprietor },
+  { icon: Calendar, label: 'Track Record', value: 'Since 2012 · 14+ Yrs' },
+  { icon: Compass, label: 'Case Reach', value: contactInfo.coverage },
+  { icon: Award, label: 'Volume Facilitation', value: contactInfo.disbursement },
+];
 
 export default function About() {
   return (
-    <section id="about" className="py-20 bg-navy-950 text-white relative overflow-hidden border-b border-navy-800">
-      {/* Background glow */}
-      <div className="absolute top-1/2 -right-32 w-96 h-96 bg-royal-600/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-0 -left-32 w-96 h-96 bg-amber-500/10 rounded-full blur-[140px] pointer-events-none" />
+    <section id="about" className="relative overflow-hidden">
+      <div className="relative z-10 mx-auto max-w-7xl px-6 py-24 sm:py-28 lg:px-8 lg:py-36">
+        <div className="grid items-center gap-16 lg:grid-cols-12 lg:gap-12">
+          {/* ------------- Copy ------------- */}
+          <div className="lg:col-span-7">
+            <SectionHeading
+              tone="light"
+              eyebrow="Verified Institutional Background"
+              number="09"
+              title={
+                <>
+                  About <em className="text-gradient-gold italic">Siyaram Loans &amp; Finance</em>
+                </>
+              }
+            />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Main Grid: Info + Visual Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          {/* Left: About Text & Highlights */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-royal-800/60 border border-royal-500/40 text-amber-300 text-xs sm:text-sm font-semibold tracking-wide uppercase">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              Verified Institutional Background
+            <Reveal delay={0.15}>
+              <p className="mt-8 max-w-xl font-display text-lg italic leading-relaxed text-ink-soft sm:text-xl">
+                “Siyaram Loans &amp; Finance provides professional loan consulting and financing
+                assistance, connecting customer requirements with an extensive network of banking
+                and financial institutions.”
+              </p>
+            </Reveal>
+
+            <Reveal delay={0.24}>
+              <p className="mt-7 max-w-xl text-sm leading-relaxed text-ink-soft">
+                Founded under the leadership of proprietor{' '}
+                <strong className="font-semibold text-ink">Ramesh Sawant</strong>, Siyaram Loans
+                &amp; Finance operates with an uncompromising principle:{' '}
+                <span className="font-semibold text-gold-700">0% customer fees</span>. By acting as
+                a direct institutional facilitator, we match retail, MSME and corporate borrowers
+                with premier lenders — without billing consulting fees to the client.
+              </p>
+            </Reveal>
+
+            {/* Pillars */}
+            <div className="mt-11 grid grid-cols-1 gap-x-12 sm:grid-cols-2">
+              {pillars.map((p, idx) => (
+                <Reveal key={p.label} delay={0.1 + idx * 0.06}>
+                  <div className="flex items-center gap-4 border-t border-ink/[0.08] py-5">
+                    <p.icon className="h-4 w-4 shrink-0 text-gold-600" />
+                    <div>
+                      <div className="font-mono text-[9px] uppercase tracking-widest2 text-ink-muted">
+                        {p.label}
+                      </div>
+                      <div className="mt-1 font-display text-base text-ink">{p.value}</div>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
             </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white font-heading tracking-tight leading-tight">
-              About <span className="text-gradient-gold">Siyaram Loans & Finance</span>
-            </h2>
-
-            <blockquote className="p-4 rounded-2xl bg-white/5 border-l-4 border-amber-400 text-slate-200 text-base sm:text-lg italic font-normal leading-relaxed">
-              “Siyaram Loans & Finance provides professional loan consulting and financing assistance, connecting customer requirements with an extensive network of banking and financial institutions.”
-            </blockquote>
-
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
-              Founded under the leadership of proprietor <strong className="text-white font-bold">Ramesh Sawant</strong>, Siyaram Loans & Finance operates with an uncompromising principle: <span className="text-amber-400 font-semibold">0% customer fees</span>. By acting as a direct institutional facilitator, we match retail, MSME, and corporate borrowers with premier lenders without billing consulting fees to the client.
-            </p>
-
-            {/* 4 Core Verified Pillars */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div className="p-4 rounded-xl bg-navy-900/90 border border-navy-700/80 flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-amber-400/10 text-amber-400 flex items-center justify-center shrink-0">
-                  <UserCheck className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs text-slate-400">Proprietorship</div>
-                  <div className="text-sm font-bold text-white">{contactInfo.proprietor}</div>
-                </div>
+            <Reveal delay={0.3}>
+              <div className="mt-10">
+                <GoldButton
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToId('contact');
+                  }}
+                >
+                  Connect With Ramesh Sawant
+                </GoldButton>
               </div>
-
-              <div className="p-4 rounded-xl bg-navy-900/90 border border-navy-700/80 flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-royal-400/10 text-royal-400 flex items-center justify-center shrink-0">
-                  <Calendar className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs text-slate-400">Track Record</div>
-                  <div className="text-sm font-bold text-white">{contactInfo.experience} (14+ Yrs)</div>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-navy-900/90 border border-navy-700/80 flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-400 flex items-center justify-center shrink-0">
-                  <Compass className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs text-slate-400">Case Reach</div>
-                  <div className="text-sm font-bold text-white">{contactInfo.coverage}</div>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-navy-900/90 border border-navy-700/80 flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-amber-400/10 text-amber-400 flex items-center justify-center shrink-0">
-                  <Award className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs text-slate-400">Volume Facilitation</div>
-                  <div className="text-sm font-bold text-white">{contactInfo.disbursement}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <a
-                href="#contact"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-navy-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-sm shadow-glow-gold transition-all"
-              >
-                <span>Connect With Ramesh Sawant</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
+            </Reveal>
           </div>
 
-          {/* Right: Ramesh Sawant Profile Showcase */}
-          <div className="lg:col-span-5 relative">
-            <div className="rounded-3xl p-6 sm:p-7 bg-gradient-to-b from-navy-850 to-navy-950 border border-royal-500/40 shadow-2xl relative overflow-hidden group">
-              
-              {/* Photo Container */}
-              <div className="relative rounded-2xl overflow-hidden mb-6 aspect-[4/5] bg-navy-900 border border-royal-500/30 shadow-lg">
-                <img
-                  src="/ramesh-sawant.jpg"
-                  alt="Ramesh Sawant - Proprietor, Siyaram Loans & Finance"
-                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                />
-                
-                {/* Overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-transparent to-transparent opacity-80" />
+          {/* ------------- Portrait ------------- */}
+          <div className="lg:col-span-5">
+            <Reveal y={50}>
+              <div className="relative mx-auto max-w-sm lg:ml-auto lg:mr-0">
+                {/* Arch frame */}
+                <div className="arch bg-gradient-to-b from-gold-500/70 via-gold-400/25 to-transparent p-px">
+                  <div className="arch relative overflow-hidden bg-navy-900">
+                    <motion.img
+                      src="/ramesh-sawant.jpg"
+                      alt="Ramesh Sawant — Proprietor, Siyaram Loans & Finance"
+                      className="aspect-[4/5] w-full object-cover object-top"
+                      initial={{ scale: 1.12 }}
+                      whileInView={{ scale: 1 }}
+                      viewport={{ once: true, margin: '-80px' }}
+                      transition={{ duration: 1.6, ease: EASE }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy-950/80 via-navy-950/10 to-transparent" />
 
-                {/* Floating Official Logo Badge on the photo */}
-                <div className="absolute top-4 left-4 p-2 rounded-xl bg-white/95 backdrop-blur-md shadow-lg border border-white/50 w-16 h-16 flex items-center justify-center">
-                  <img
-                    src="/logo.png"
-                    alt="Siyaram Official Logo"
-                    className="w-full h-full object-contain"
-                  />
+                    {/* Name overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
+                      <div className="mx-auto w-fit rounded-full border border-gold-400/50 bg-navy-950/60 px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 text-gold-300 backdrop-blur-md">
+                        Proprietor &amp; Banker
+                      </div>
+                      <h3 className="mt-3 font-display text-3xl text-white">Ramesh Sawant</h3>
+                      <p className="mt-1 text-xs text-slate-300">
+                        Financial Advisor &amp; Loan Consultant
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Title badge overlay on photo bottom */}
-                <div className="absolute bottom-4 left-4 right-4">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300 px-2.5 py-1 rounded-full bg-navy-950/80 border border-amber-400/40 backdrop-blur-md">
-                    Proprietor & Banker
-                  </span>
-                  <h3 className="text-2xl font-black text-white font-heading mt-2">
-                    Ramesh Sawant
-                  </h3>
-                  <p className="text-xs text-slate-300 font-medium">
-                    Financial Advisor & Loan Consultant
-                  </p>
+                {/* Floating badge */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5, duration: 0.7, ease: EASE }}
+                  className="absolute -left-5 top-16 hidden rotate-[-4deg] rounded-2xl border border-ink/[0.07] bg-white px-4 py-3 shadow-lift-light sm:block"
+                >
+                  <div className="font-display text-2xl text-gold-700">14+</div>
+                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-ink-muted">
+                    Years Advisory
+                  </div>
+                </motion.div>
+
+                {/* Direct lines */}
+                <div className="mt-6 grid grid-cols-2 gap-3">
+                  {[
+                    { number: contactInfo.phone, clean: contactInfo.phoneClean },
+                    { number: contactInfo.phone2, clean: contactInfo.phone2Clean },
+                  ].map((line) => (
+                    <a
+                      key={line.clean}
+                      href={`tel:${line.clean}`}
+                      className="group flex items-center justify-between rounded-2xl border border-ink/[0.08] bg-white/80 px-4 py-3.5 shadow-soft transition-all duration-300 hover:border-gold-500/50"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Phone className="h-3.5 w-3.5 text-gold-600" />
+                        <span className="font-mono text-[11px] font-semibold text-ink">
+                          {line.number}
+                        </span>
+                      </div>
+                      <ArrowUpRight className="h-3.5 w-3.5 text-ink-muted/60 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-gold-700" />
+                    </a>
+                  ))}
                 </div>
               </div>
-
-              {/* Verified Contact Bar */}
-              <div className="p-4 rounded-xl bg-navy-900 border border-navy-700/80 space-y-2.5">
-                <div className="text-[10px] uppercase font-bold text-slate-400">Direct Contact Helplines</div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <a
-                    href={`tel:${contactInfo.phoneClean}`}
-                    className="p-2.5 rounded-lg bg-navy-950/70 border border-navy-700/70 hover:border-amber-400/50 flex items-center justify-between group transition-all"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-3.5 h-3.5 text-amber-400" />
-                      <span className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">
-                        {contactInfo.phone}
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">Call</span>
-                  </a>
-
-                  <a
-                    href={`tel:${contactInfo.phone2Clean}`}
-                    className="p-2.5 rounded-lg bg-navy-950/70 border border-navy-700/70 hover:border-amber-400/50 flex items-center justify-between group transition-all"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-3.5 h-3.5 text-amber-400" />
-                      <span className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">
-                        {contactInfo.phone2}
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">Call</span>
-                  </a>
-                </div>
-              </div>
-
-            </div>
+            </Reveal>
           </div>
-
         </div>
-
       </div>
     </section>
   );

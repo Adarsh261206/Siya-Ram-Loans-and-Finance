@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Mail, Menu, X, ArrowRight, ShieldCheck, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Phone, Mail, Menu, X, ArrowUpRight } from 'lucide-react';
 import { contactInfo, navLinks } from '../data/loanData';
+import { Magnetic, GoldButton, Marquee, EASE } from './ui/Primitives';
+import { scrollToId, scrollToTop, stopScroll, startScroll } from '../lib/scroll';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -9,26 +12,21 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Toggle sticky shadow/bg
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 24);
 
-      // Bottom of page detection -> highlight Contact
       if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80) {
         setActiveSection('contact');
         return;
       }
 
-      // Dynamic active section detection using absolute document offsets
-      const scrollPosition = window.scrollY + 120;
-      const sectionIds = navLinks.map(link => link.href.substring(1));
+      const scrollPosition = window.scrollY + 140;
+      const sectionIds = navLinks.map((link) => link.href.substring(1));
 
-      for (let i = sectionIds.length - 1; i >= 0; i--) {
+      for (let i = sectionIds.length - 1; i >= 0; i -= 1) {
         const id = sectionIds[i];
-        // Support both #calculator and #savings-calculator
-        const el = document.getElementById(id) || (id === 'savings-calculator' ? document.getElementById('calculator') : null);
+        const el = document.getElementById(id);
         if (el) {
-          const rect = el.getBoundingClientRect();
-          const elementTop = rect.top + window.scrollY;
+          const elementTop = el.getBoundingClientRect().top + window.scrollY;
           if (scrollPosition >= elementTop) {
             setActiveSection(id);
             break;
@@ -38,265 +36,275 @@ export default function Navbar() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial check
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      stopScroll();
+      document.body.style.overflow = 'hidden';
+    } else {
+      startScroll();
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   const handleNavClick = (e, href) => {
     e.preventDefault();
     setMobileMenuOpen(false);
 
-    if (href === '#home') {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+    const id = href.substring(1);
+    if (id === 'home') {
+      scrollToTop();
       if (window.location.hash) {
         window.history.replaceState(null, '', window.location.pathname);
       }
       return;
     }
 
-    // Find target element (also check fallback id if needed)
-    let target = document.querySelector(href);
-    if (!target && href === '#savings-calculator') {
-      target = document.getElementById('calculator') || document.getElementById('savings-calculator');
-    }
-    if (!target && href === '#calculator') {
-      target = document.getElementById('savings-calculator') || document.getElementById('calculator');
-    }
-
-    if (target) {
-      const topOffset = 80;
-      const elementPosition = target.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - topOffset;
-      window.scrollTo({
-        top: Math.max(0, offsetPosition),
-        behavior: 'smooth'
-      });
-      window.history.replaceState(null, '', href);
-    }
+    scrollToId(id);
+    window.history.replaceState(null, '', href);
   };
 
   return (
     <>
-      {/* Top Announcement Bar (Tablet and Desktop) */}
-      <div className="bg-navy-950 text-slate-300 text-xs py-2 px-4 border-b border-navy-800/80 hidden md:block relative z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-semibold text-[11px] border border-emerald-500/30">
-              <ShieldCheck className="w-3.5 h-3.5" /> 0% Customer Fees Model
+      {/* ---------------- Top ticker tape (slim advisory strip) ---------------- */}
+      <div className="relative z-[60] hidden overflow-hidden md:block">
+        <div className="mx-auto flex max-w-7xl items-center gap-4 px-6 py-1.5 font-mono text-[9px] uppercase tracking-widest2 lg:px-8">
+          {/* Live badge */}
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-gold-500/30 bg-gold-400/10 px-2.5 py-[3px] text-gold-700">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold-500 opacity-60" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-gold-500" />
             </span>
-            <span className="text-slate-400 hidden xl:inline">
-              Empowering Your Dreams, Financing Your Future • 270+ Institutional Partner Network
-            </span>
-          </div>
-          <div className="flex items-center gap-4 sm:gap-6">
-            <div className="flex items-center gap-1.5 text-slate-300">
-              <Phone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span className="hidden lg:inline text-slate-400">Helpline:</span>
-              <a
-                href={`tel:${contactInfo.phoneClean}`}
-                className="hover:text-amber-400 transition-colors font-medium text-slate-300"
+            Advisory Desk · Live
+          </span>
+
+          {/* Scrolling brand tape */}
+          <Marquee className="mask-fade-x min-w-0 flex-1" pauseOnHover>
+            {[
+              '0% Customer Fees',
+              '270+ Institutional Partners',
+              'Since 2012',
+              'Pan-India Case Processing',
+              '₹10,000 Cr+ Facilitated',
+            ].map((item) => (
+              <span
+                key={item}
+                className="mx-5 flex shrink-0 items-center gap-5 whitespace-nowrap text-ink-muted"
               >
-                {contactInfo.phone}
-              </a>
-              <span className="text-slate-500">/</span>
-              <a
-                href={`tel:${contactInfo.phone2Clean}`}
-                className="hover:text-amber-400 transition-colors font-medium text-slate-300"
-              >
-                {contactInfo.phone2}
-              </a>
-            </div>
+                {item}
+                <span className="text-gold-500/80">✦</span>
+              </span>
+            ))}
+          </Marquee>
+
+          {/* Contacts */}
+          <div className="flex shrink-0 items-center gap-4">
+            <a
+              href={`tel:${contactInfo.phoneClean}`}
+              className="flex items-center gap-1.5 whitespace-nowrap text-ink-soft transition-colors hover:text-gold-700"
+            >
+              <Phone className="h-2.5 w-2.5 shrink-0 text-gold-600" />
+              {contactInfo.phone}
+            </a>
+            <span className="hidden text-ink-muted/50 xl:inline">·</span>
             <a
               href={`mailto:${contactInfo.email}`}
-              className="flex items-center gap-1.5 hover:text-amber-400 transition-colors text-slate-300"
+              className="hidden items-center gap-1.5 whitespace-nowrap text-ink-soft transition-colors hover:text-gold-700 xl:flex"
             >
-              <Mail className="w-3.5 h-3.5 text-royal-400" />
-              <span>{contactInfo.email}</span>
+              <Mail className="h-2.5 w-2.5 shrink-0 text-gold-600" />
+               {contactInfo.email}
             </a>
           </div>
         </div>
       </div>
 
-      {/* Main Sticky Header */}
+      {/* ---------------- Main header ---------------- */}
       <header
-        className={`sticky top-0 left-0 right-0 z-40 transition-all duration-300 ${
+        className={`sticky top-0 z-[60] transition-all duration-500 ${
           isScrolled
-            ? 'bg-navy-950/95 backdrop-blur-md shadow-2xl py-2.5 border-b border-navy-800'
-            : 'bg-navy-950/90 backdrop-blur-sm py-3 sm:py-3.5 border-b border-white/5'
+            ? 'bg-[#FBF7EC]/85 py-3 shadow-[0_16px_50px_-30px_rgba(10,23,48,0.4)] backdrop-blur-xl'
+            : 'py-4 sm:py-5'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6 xl:px-8">
-          <div className="flex items-center justify-between gap-2 xl:gap-4">
-            
-            {/* Logo */}
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 lg:px-8">
+          {/* Brand */}
+          <a
+            href="#home"
+            onClick={(e) => handleNavClick(e, '#home')}
+            className="group flex shrink-0 items-center gap-3"
+            aria-label="Siyaram Loans & Finance — Home"
+          >
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white p-1 shadow-soft ring-1 ring-ink/[0.06] transition-transform duration-500 group-hover:rotate-[6deg]">
+              <img src="/logo.png" alt="Siyaram Loans & Finance" className="h-full w-full object-contain" />
+            </div>
+            <div className="leading-none">
+              <span className="block font-display text-lg font-semibold tracking-tight text-ink">
+                SIYARAM
+              </span>
+              <span className="mt-1 block font-mono text-[9px] uppercase tracking-widest2 text-gold-600">
+                Loans &amp; Finance
+              </span>
+            </div>
+          </a>
+
+          {/* Desktop nav */}
+          <nav className="hidden items-center gap-7 lg:flex" aria-label="Main navigation">
+            {navLinks.map((link) => {
+              const id = link.href.substring(1);
+              const isActive = activeSection === id;
+              return (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  className={`link-sweep text-[13px] font-medium tracking-wide transition-colors duration-300 ${
+                    isActive ? 'is-active text-ink' : 'text-ink-soft hover:text-ink'
+                  }`}
+                >
+                  {link.name}
+                </a>
+              );
+            })}
+          </nav>
+
+          {/* Desktop CTA */}
+          <div className="hidden shrink-0 lg:block">
+            <Magnetic strength={0.18}>
+              <GoldButton compact onClick={(e) => handleNavClick(e, '#contact')}>
+                Free Consultation
+              </GoldButton>
+            </Magnetic>
+          </div>
+
+          {/* Mobile controls */}
+          <div className="flex items-center gap-3 lg:hidden">
             <a
-              href="#home"
-              onClick={(e) => handleNavClick(e, '#home')}
-              className="flex items-center gap-2 sm:gap-2.5 xl:gap-3 group text-left shrink-0"
-              aria-label="Siyaram Loans & Finance Homepage"
+              href={`tel:${contactInfo.phoneClean}`}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-ink/10 bg-white/70 text-gold-700 shadow-soft transition-colors hover:border-gold-500/60"
+              aria-label="Call helpline"
             >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 xl:w-11 xl:h-11 rounded-xl bg-white p-1 flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform overflow-hidden">
-                <img
-                  src="/logo.png"
-                  alt="Siyaram Loans & Finance Logo"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1 sm:gap-1.5">
-                  <span className="text-base sm:text-lg xl:text-xl font-black tracking-tight text-white font-heading">
-                    SIYARAM
-                  </span>
-                  <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    Est. 2012
-                  </span>
-                </div>
-                <span className="text-[9px] sm:text-[10px] xl:text-[11px] tracking-wider font-semibold text-amber-400 uppercase">
-                  Loans & Finance
-                </span>
-              </div>
+              <Phone className="h-4 w-4" />
             </a>
-
-            {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1.5" aria-label="Main Navigation">
-              {navLinks.map((link) => {
-                const linkId = link.href.substring(1);
-                const isActive = activeSection === linkId || (linkId === 'savings-calculator' && activeSection === 'calculator');
-                return (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    onClick={(e) => handleNavClick(e, link.href)}
-                    className={`px-1.5 xl:px-3 py-1.5 text-xs xl:text-sm font-semibold rounded-lg transition-all duration-200 relative whitespace-nowrap ${
-                      isActive
-                        ? 'text-white bg-royal-700/40 shadow-inner'
-                        : 'text-slate-300 hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    {link.name}
-                    {isActive && (
-                      <span className="absolute bottom-0 left-1.5 right-1.5 h-0.5 bg-gradient-to-r from-amber-400 to-yellow-300 rounded-full shadow-glow-gold" />
-                    )}
-                  </a>
-                );
-              })}
-            </nav>
-
-            {/* Right Consultation CTA on Desktop */}
-            <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
-              <a
-                href="#contact"
-                onClick={(e) => handleNavClick(e, '#contact')}
-                className="relative inline-flex items-center justify-center gap-1.5 xl:gap-2 px-3 xl:px-5 py-2 xl:py-2.5 text-xs xl:text-sm font-bold text-navy-950 transition-all duration-300 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 shadow-glow-gold hover:shadow-lg hover:scale-[1.02] active:scale-95 group whitespace-nowrap"
-              >
-                <span className="hidden xl:inline">Get Free Consultation</span>
-                <span className="xl:hidden">Free Consultation</span>
-                <ArrowRight className="w-3.5 h-3.5 xl:w-4 xl:h-4 transition-transform group-hover:translate-x-0.5" />
-              </a>
-            </div>
-
-            {/* Mobile / Tablet Controls */}
-            <div className="flex items-center gap-2 lg:hidden">
-              <a
-                href={`tel:${contactInfo.phoneClean}`}
-                className="p-2 rounded-xl text-amber-400 bg-navy-900 border border-navy-800 hover:border-amber-400 transition-colors"
-                aria-label="Call Siyaram Helpline"
-              >
-                <Phone className="w-4 h-4" />
-              </a>
-
-              <a
-                href="#contact"
-                onClick={(e) => handleNavClick(e, '#contact')}
-                className="hidden sm:inline-flex px-3 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-navy-950 shadow-sm whitespace-nowrap"
-              >
-                Free Consult
-              </a>
-
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-xl text-slate-200 hover:text-white hover:bg-navy-850 border border-navy-800 focus:outline-none transition-colors"
-                aria-label={mobileMenuOpen ? "Close Navigation Menu" : "Open Navigation Menu"}
-                aria-expanded={mobileMenuOpen}
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6 text-amber-400" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
-
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-ink/10 bg-white/70 text-ink shadow-soft transition-colors hover:border-gold-500/60"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
           </div>
         </div>
-
-        {/* Mobile Navigation Dropdown Menu (Directly attached under header) */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-navy-950/98 backdrop-blur-xl border-t border-navy-850 border-b border-navy-800 shadow-2xl px-4 sm:px-6 py-4 animate-in fade-in slide-in-from-top-2 duration-200">
-            {/* Drawer Sub-Header */}
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-navy-800/80">
-              <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider font-heading">
-                Menu Navigation
-              </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                0% Customer Fees
-              </span>
-            </div>
-
-            {/* Nav Links */}
-            <div className="space-y-1">
-              {navLinks.map((link) => {
-                const linkId = link.href.substring(1);
-                const isActive = activeSection === linkId || (linkId === 'savings-calculator' && activeSection === 'calculator');
-                return (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    onClick={(e) => handleNavClick(e, link.href)}
-                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                      isActive
-                        ? 'bg-royal-600/30 text-white border-l-4 border-amber-400 font-bold pl-3 shadow-inner'
-                        : 'text-slate-300 hover:text-white hover:bg-navy-900/80'
-                    }`}
-                  >
-                    <span>{link.name}</span>
-                    <ChevronRight className={`w-4 h-4 ${isActive ? 'text-amber-400' : 'text-slate-600'}`} />
-                  </a>
-                );
-              })}
-            </div>
-
-            {/* Quick Actions in Mobile Drawer */}
-            <div className="mt-4 pt-3.5 border-t border-navy-800/80 space-y-2.5">
-              <a
-                href="#contact"
-                onClick={(e) => handleNavClick(e, '#contact')}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-navy-950 font-bold bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-sm shadow-md active:scale-98 transition-transform"
-              >
-                <span>Get Free Consultation</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
-
-              <div className="grid grid-cols-2 gap-2">
-                <a
-                  href={`tel:${contactInfo.phoneClean}`}
-                  className="flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl text-slate-200 font-medium bg-navy-900/90 border border-navy-700 text-[11px] sm:text-xs hover:border-amber-400 transition-colors"
-                >
-                  <Phone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span className="truncate">{contactInfo.phone}</span>
-                </a>
-                <a
-                  href={`tel:${contactInfo.phone2Clean}`}
-                  className="flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl text-slate-200 font-medium bg-navy-900/90 border border-navy-700 text-[11px] sm:text-xs hover:border-amber-400 transition-colors"
-                >
-                  <Phone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span className="truncate">{contactInfo.phone2}</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
       </header>
+
+      {/* ---------------- Fullscreen mobile menu ---------------- */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            className="fixed inset-0 z-[80] lg:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+          >
+            <div className="absolute inset-0 bg-[#FBF7EC]/[0.98] backdrop-blur-2xl" />
+            {/* soft bridging glow */}
+            <div className="pointer-events-none absolute -top-24 right-[-20%] h-80 w-80 rounded-full bg-gold-400/20 blur-3xl" />
+            <div className="pointer-events-none absolute bottom-[-20%] left-[-20%] h-80 w-80 rounded-full bg-navy-400/15 blur-3xl" />
+
+            <div className="relative flex h-full flex-col px-6 pb-10 pt-5">
+              {/* Overlay top bar */}
+              <div className="flex items-center justify-between pb-5">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white p-1 shadow-soft ring-1 ring-ink/[0.06]">
+                    <img src="/logo.png" alt="Siyaram" className="h-full w-full object-contain" />
+                  </div>
+                  <span className="font-display text-base font-semibold text-ink">SIYARAM</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-ink/10 bg-white/70 text-gold-700 shadow-soft"
+                  aria-label="Close navigation menu"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Links */}
+              <nav className="flex-1 overflow-y-auto py-4" aria-label="Mobile navigation">
+                {navLinks.map((link, i) => {
+                  const id = link.href.substring(1);
+                  const isActive = activeSection === id;
+                  return (
+                    <motion.div
+                      key={link.name}
+                      initial={{ opacity: 0, y: 26 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.08 + i * 0.055, duration: 0.6, ease: EASE }}
+                    >
+                      <a
+                        href={link.href}
+                        onClick={(e) => handleNavClick(e, link.href)}
+                        className="group flex items-baseline justify-between border-b border-ink/[0.07] py-4"
+                      >
+                        <span
+                          className={`font-display text-[1.7rem] leading-none transition-colors duration-300 ${
+                            isActive ? 'text-gold-700' : 'text-ink group-hover:text-gold-700'
+                          }`}
+                        >
+                          {link.name}
+                        </span>
+                        <span className="font-mono text-[10px] tracking-widest2 text-ink-muted/70">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                      </a>
+                    </motion.div>
+                  );
+                })}
+              </nav>
+
+              {/* Bottom contact */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.6, ease: EASE }}
+                className="space-y-3 pt-5"
+              >
+                <p className="font-mono text-[10px] uppercase tracking-widest2 text-ink-muted">
+                  Advisory Desk — 0% Customer Fees
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <a
+                    href={`tel:${contactInfo.phoneClean}`}
+                    className="flex items-center justify-center gap-2 rounded-full border border-ink/10 bg-white/70 py-3 text-xs font-semibold text-ink shadow-soft"
+                  >
+                    <Phone className="h-3.5 w-3.5 text-gold-600" />
+                    Call Desk
+                  </a>
+                  <a
+                    href={`https://wa.me/${contactInfo.whatsappClean}?text=${encodeURIComponent(
+                      'Hello Siyaram Loans & Finance, I would like to inquire about a loan.'
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 rounded-full bg-emerald-600 py-3 text-xs font-semibold text-white shadow-soft"
+                  >
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                    WhatsApp
+                  </a>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

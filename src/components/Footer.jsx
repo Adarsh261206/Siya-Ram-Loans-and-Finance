@@ -1,185 +1,197 @@
 import React from 'react';
-import { Landmark, Phone, Mail, User, ShieldCheck, ArrowUp, ChevronRight } from 'lucide-react';
+import { Phone, Mail, ArrowUp, ArrowUpRight } from 'lucide-react';
 import { contactInfo, navLinks } from '../data/loanData';
+import { Marquee } from './ui/Primitives';
+import { scrollToId, scrollToTop } from '../lib/scroll';
+
+const loanLinks = [
+  { name: 'Home Loan', href: '#loan-solutions' },
+  { name: 'Home Loan Balance Transfer', href: '#balance-transfer' },
+  { name: 'Personal Loan', href: '#loan-solutions' },
+  { name: 'Personal Loan Balance Transfer', href: '#balance-transfer' },
+  { name: 'Business Loan', href: '#loan-solutions' },
+  { name: 'Fresh Property Purchase', href: '#loan-solutions' },
+];
 
 export default function Footer() {
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
-  const scrollToSection = (e, href) => {
+  const handleLink = (e, href) => {
     e.preventDefault();
-    const target = document.querySelector(href);
-    if (target) {
-      const topOffset = 80;
-      const elementPosition = target.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - topOffset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
+    scrollToId(href.substring(1));
   };
 
   return (
-    <footer className="bg-navy-950 text-slate-400 border-t border-navy-800 relative z-20 pb-20 sm:pb-8">
-      {/* Top Banner inside footer */}
-      <div className="border-b border-navy-800/80 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+    <footer className="relative z-20">
+      {/* Oversized wordmark marquee */}
+      <div className="py-10 sm:py-12">
+        <Marquee speed="slow" pauseOnHover={false}>
+          {[0, 1, 2, 3].map((i) => (
+            <span
+              key={i}
+              className="mx-10 whitespace-nowrap font-display text-5xl text-outline sm:text-6xl lg:text-7xl"
+            >
+              Siyaram Loans &amp; Finance{' '}
+              <span className="align-middle text-3xl text-gold-500/60 lg:text-4xl">✦</span>
+            </span>
+          ))}
+        </Marquee>
+      </div>
+
+      {/* Brand row */}
+      <div>
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-7 px-6 py-10 md:flex-row lg:px-8">
           <div className="flex items-center gap-4 text-center md:text-left">
-            <div className="w-12 h-12 rounded-2xl bg-white p-1 flex items-center justify-center font-bold shadow-glow-gold shrink-0 overflow-hidden">
-              <img
-                src="/logo.png"
-                alt="Siyaram Loans & Finance"
-                className="w-full h-full object-contain"
-              />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-soft ring-1 ring-ink/[0.06]">
+              <img src="/logo.png" alt="Siyaram Loans & Finance" className="h-full w-full object-contain" />
             </div>
             <div>
-              <span className="text-xl font-extrabold text-white font-heading tracking-tight block">
-                SIYARAM LOANS & FINANCE
+              <span className="block font-display text-xl tracking-tight text-ink">
+                SIYARAM LOANS &amp; FINANCE
               </span>
-              <span className="text-xs text-amber-300 font-semibold">
-                Empowering Your Dreams, Financing Your Future.
+              <span className="mt-1 block font-mono text-[10px] uppercase tracking-widest2 text-gold-700">
+                Empowering Your Dreams, Financing Your Future
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <span className="rounded-full border border-emerald-600/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-emerald-700">
               0% Customer Fees
             </span>
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-royal-500/15 text-royal-300 border border-royal-500/30">
+            <span className="hidden rounded-full border border-ink/10 bg-white/70 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-ink-soft sm:inline">
               270+ Partner Banks
             </span>
             <button
               type="button"
               onClick={scrollToTop}
-              className="p-2.5 rounded-xl bg-navy-900 border border-navy-700 hover:border-amber-400 hover:text-white transition-colors"
               aria-label="Back to top"
+              className="group flex h-10 w-10 items-center justify-center rounded-full border border-ink/10 bg-white/70 text-gold-700 shadow-soft transition-all duration-300 hover:border-gold-500/60 hover:shadow-gold-soft"
             >
-              <ArrowUp className="w-4 h-4 text-amber-400" />
+              <ArrowUp className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Main 4 Columns */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-          
-          {/* Column 1: Brand Info */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-white">About Siyaram</h4>
-            <p className="text-xs text-slate-300 leading-relaxed font-normal">
-              Empowering Your Dreams, Financing Your Future. Professional loan consulting across India with 0% customer fees, matching borrowers with optimal institutional credit facilities.
+      {/* Columns */}
+      <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
+          {/* About */}
+          <div>
+            <h4 className="font-mono text-[10px] uppercase tracking-widest2 text-gold-700">
+              About Siyaram
+            </h4>
+            <p className="mt-5 text-xs leading-relaxed text-ink-soft">
+              Professional loan consulting across India with 0% customer fees — matching borrowers
+              with optimal institutional credit facilities.
             </p>
-            <div className="pt-2 text-xs text-slate-400 space-y-1">
-              <div><strong>Founded:</strong> Since 2012</div>
-              <div><strong>Network:</strong> 270+ Banking & Financial Partners</div>
-              <div><strong>Disbursement:</strong> ₹10,000 Cr+</div>
+            <div className="mt-6 space-y-2.5 pt-5 font-mono text-[10px] uppercase tracking-widest2 text-ink-muted">
+              <div className="flex justify-between">
+                <span>Founded</span>
+                <span className="text-ink">Since 2012</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Network</span>
+                <span className="text-ink">270+ Partners</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Disbursement</span>
+                <span className="text-gold-700">₹10,000 Cr+</span>
+              </div>
             </div>
           </div>
 
-          {/* Column 2: Quick Links */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-white">Quick Links</h4>
-            <ul className="space-y-2.5 text-xs">
+          {/* Quick links */}
+          <div>
+            <h4 className="font-mono text-[10px] uppercase tracking-widest2 text-gold-700">
+              Quick Links
+            </h4>
+            <ul className="mt-5 space-y-3">
               {navLinks.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    onClick={(e) => scrollToSection(e, link.href)}
-                    className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
+                    onClick={(e) => handleLink(e, link.href)}
+                    className="group flex items-center gap-2 text-xs text-ink-soft transition-colors duration-300 hover:text-gold-700"
                   >
-                    <ChevronRight className="w-3 h-3 text-royal-500" />
-                    <span>{link.name}</span>
+                    <span className="h-px w-3 bg-navy-800/20 transition-all duration-300 group-hover:w-5 group-hover:bg-gold-500" />
+                    {link.name}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Column 3: Loan Solutions */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-white">Loan Solutions</h4>
-            <ul className="space-y-2.5 text-xs">
-              {[
-                { name: "Home Loan", href: "#loan-solutions" },
-                { name: "Home Loan Balance Transfer", href: "#balance-transfer" },
-                { name: "Personal Loan", href: "#loan-solutions" },
-                { name: "Personal Loan Balance Transfer", href: "#balance-transfer" },
-                { name: "Business Loan", href: "#loan-solutions" },
-                { name: "Fresh Property Purchase", href: "#loan-solutions" },
-              ].map((item, idx) => (
-                <li key={idx}>
+          {/* Loan solutions */}
+          <div>
+            <h4 className="font-mono text-[10px] uppercase tracking-widest2 text-gold-700">
+              Loan Solutions
+            </h4>
+            <ul className="mt-5 space-y-3">
+              {loanLinks.map((item) => (
+                <li key={item.name}>
                   <a
                     href={item.href}
-                    onClick={(e) => scrollToSection(e, item.href)}
-                    className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
+                    onClick={(e) => handleLink(e, item.href)}
+                    className="group flex items-center gap-2 text-xs text-ink-soft transition-colors duration-300 hover:text-gold-700"
                   >
-                    <ChevronRight className="w-3 h-3 text-royal-500" />
-                    <span>{item.name}</span>
+                    <span className="h-px w-3 bg-navy-800/20 transition-all duration-300 group-hover:w-5 group-hover:bg-gold-500" />
+                    {item.name}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Column 4: Contact */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-white">Advisory Desk</h4>
-            <div className="space-y-3 text-xs">
-              <div className="flex items-start gap-2.5">
-                <User className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <div>
-                  <div className="text-slate-400">Proprietor</div>
-                  <div className="font-bold text-white text-sm">{contactInfo.proprietor}</div>
+          {/* Advisory desk */}
+          <div>
+            <h4 className="font-mono text-[10px] uppercase tracking-widest2 text-gold-700">
+              Advisory Desk
+            </h4>
+            <div className="mt-5 space-y-5">
+              <div>
+                <div className="text-[10px] uppercase tracking-wider text-ink-muted">Proprietor</div>
+                <div className="mt-1 font-display text-base text-ink">{contactInfo.proprietor}</div>
+              </div>
+
+              <div>
+                <div className="text-[10px] uppercase tracking-wider text-ink-muted">Helplines</div>
+                <div className="mt-2 flex flex-col gap-2">
+                  {[contactInfo.phone, contactInfo.phone2].map((num, i) => (
+                    <a
+                      key={num}
+                      href={`tel:${i === 0 ? contactInfo.phoneClean : contactInfo.phone2Clean}`}
+                      className="group flex items-center gap-2 font-mono text-xs font-semibold text-ink transition-colors hover:text-gold-700"
+                    >
+                      <Phone className="h-3.5 w-3.5 text-gold-600" />
+                      {num}
+                      <ArrowUpRight className="h-3 w-3 text-ink-muted/50 opacity-0 transition-opacity group-hover:opacity-100" />
+                    </a>
+                  ))}
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5">
-                <Phone className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <div>
-                  <div className="text-slate-400">Helplines</div>
-                  <div className="flex flex-col gap-1">
-                    <a href={`tel:${contactInfo.phoneClean}`} className="font-bold text-white hover:text-amber-300 transition-colors">
-                      {contactInfo.phone}
-                    </a>
-                    <a href={`tel:${contactInfo.phone2Clean}`} className="font-bold text-white hover:text-amber-300 transition-colors">
-                      {contactInfo.phone2}
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Mail className="w-4 h-4 text-royal-400 shrink-0 mt-0.5" />
-                <div>
-                  <div className="text-slate-400">Official Email</div>
-                  <a href={`mailto:${contactInfo.email}`} className="font-medium text-slate-200 hover:text-amber-300 transition-colors break-all">
-                    {contactInfo.email}
-                  </a>
-                </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-wider text-ink-muted">Email</div>
+                <a
+                  href={`mailto:${contactInfo.email}`}
+                  className="mt-1.5 flex items-center gap-2 break-all text-xs text-ink-soft transition-colors hover:text-gold-700"
+                >
+                  <Mail className="h-3.5 w-3.5 shrink-0 text-gold-600" />
+                  {contactInfo.email}
+                </a>
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* Bottom Bar with Copyright */}
-      <div className="border-t border-navy-900 py-6 bg-navy-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 text-center sm:text-left">
-          <div>
-            © 2026 Siyaram Loans & Finance. All Rights Reserved.
-          </div>
-          <div className="flex items-center gap-4 text-[11px]">
-            <span>Empowering Your Dreams, Financing Your Future.</span>
-            <span>•</span>
-            <span className="text-amber-400/80">0% Customer Fees Model</span>
+      {/* Bottom bar */}
+      <div>
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 font-mono text-[10px] uppercase tracking-widest2 text-ink-muted sm:flex-row lg:px-8">
+          <span>© 2026 Siyaram Loans &amp; Finance — All Rights Reserved</span>
+          <div className="flex items-center gap-4">
+            <span className="hidden sm:inline">Empowering Your Dreams, Financing Your Future</span>
+            <span className="text-gold-700">0% Customer Fees Model</span>
           </div>
         </div>
       </div>

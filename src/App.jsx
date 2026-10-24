@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import TrustGuarantee from './components/TrustGuarantee';
@@ -15,68 +16,96 @@ import Contact from './components/Contact';
 import FloatingContact from './components/FloatingContact';
 import LoanSanctionPopup from './components/LoanSanctionPopup';
 import Footer from './components/Footer';
+import Cursor from './components/Cursor';
+import { Sheet } from './components/ui/Primitives';
+import { initSmoothScroll, destroySmoothScroll } from './lib/scroll';
 
 export default function App() {
   const [selectedLoanCategory, setSelectedLoanCategory] = useState('Home Loan Transfer');
+
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 130, damping: 28, mass: 0.3 });
+
+  useEffect(() => {
+    initSmoothScroll();
+    return () => destroySmoothScroll();
+  }, []);
 
   const handleSelectLoan = (category) => {
     setSelectedLoanCategory(category);
   };
 
   return (
-    <div className="min-h-screen bg-navy-950 text-slate-100 flex flex-col font-sans selection:bg-amber-400 selection:text-navy-950">
-      {/* Sticky Navigation */}
+    <div className="flex min-h-screen flex-col font-sans text-ink selection:bg-gold-400 selection:text-navy-950">
+      {/* Scroll progress */}
+      <motion.div
+        aria-hidden="true"
+        className="fixed left-0 right-0 top-0 z-[90] h-[2px] origin-left bg-gradient-to-r from-gold-300 via-gold-400 to-gold-600"
+        style={{ scaleX: progress }}
+      />
+
+      {/* Custom cursor ring (desktop) */}
+      <Cursor />
+
       <Navbar />
 
-      {/* Main Content Sections */}
-      <main className="flex-grow">
-        {/* 1. Hero Section with Finance Notification Carousel & CIBIL Metric */}
+      {/* Continuous curved canvas — every section slips over the previous one */}
+      <main className="relative z-0 flex-grow">
         <Hero />
 
-        {/* 2. Zero-Cost Trust Guarantee & CIBIL Cases Feature Card */}
-        <TrustGuarantee />
+        <Sheet tone="white" z={10}>
+          <TrustGuarantee />
+        </Sheet>
 
-        {/* 3. Transparent Revenue Model */}
-        <RevenueModel />
+        <Sheet tone="blue" z={20}>
+          <RevenueModel />
+        </Sheet>
 
-        {/* 4. Strategic Balance Transfer (Separated Home Loan & Personal Loan Transfer + Example) */}
-        <BalanceTransfer onSelectLoan={handleSelectLoan} />
+        <Sheet tone="white" z={30}>
+          <BalanceTransfer onSelectLoan={handleSelectLoan} />
+        </Sheet>
 
-        {/* 5. Interactive Bank Rate Savings Calculator */}
-        <section id="calculator" className="bg-slate-900 py-10 px-4 sm:px-6 lg:px-8 border-b border-navy-800">
-          <SavingsCalculator onSelectLoan={handleSelectLoan} />
-        </section>
+        <Sheet tone="blue" z={40}>
+          <section id="savings-calculator">
+            <SavingsCalculator onSelectLoan={handleSelectLoan} />
+          </section>
+        </Sheet>
 
-        {/* 6. Case Study */}
-        <CaseStudy />
+        <Sheet tone="white" z={50}>
+          <CaseStudy />
+        </Sheet>
 
-        {/* 7. Comprehensive Loan Solutions (6 Core Services) */}
-        <LoanSolutions onSelectLoan={handleSelectLoan} />
+        <Sheet tone="blue" z={60}>
+          <LoanSolutions onSelectLoan={handleSelectLoan} />
+        </Sheet>
 
-        {/* 8. Why Customers Choose Siyaram */}
-        <WhyChooseUs />
+        <Sheet tone="white" z={70}>
+          <WhyChooseUs />
+        </Sheet>
 
-        {/* 9. Simple Application Process */}
-        <Process />
+        <Sheet tone="blue" z={80}>
+          <Process />
+        </Sheet>
 
-        {/* 10. Banking & Financial Network (Government Banks First, Private Banks Second, NBFCs Third) */}
-        <Partners />
+        <Sheet tone="white" z={90}>
+          <Partners />
+        </Sheet>
 
-        {/* 11. About Section */}
-        <About />
+        <Sheet tone="blue" z={100}>
+          <About />
+        </Sheet>
 
-        {/* 12. Contact / Lead Section */}
-        <Contact selectedLoanCategory={selectedLoanCategory} />
+        <Sheet tone="white" z={110}>
+          <Contact selectedLoanCategory={selectedLoanCategory} />
+        </Sheet>
+
+        <Sheet tone="cream" z={120} className="mb-8 sm:mb-12">
+          <Footer />
+        </Sheet>
       </main>
 
-      {/* Promotional Loan Sanction Floating Notification (Configurable, Responsive) */}
       <LoanSanctionPopup onSelectLoan={handleSelectLoan} />
-
-      {/* Floating CTA Widget (WhatsApp & Call) */}
       <FloatingContact />
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }

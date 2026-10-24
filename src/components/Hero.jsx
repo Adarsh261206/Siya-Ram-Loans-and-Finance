@@ -1,101 +1,71 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ArrowRight, ShieldCheck, TrendingDown, Building, CheckCircle2, ChevronRight, Award, Sparkles, Home, RefreshCw, BadgeCheck, Landmark } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  TrendingDown,
+  Building,
+  CheckCircle2,
+  Home,
+  RefreshCw,
+  BadgeCheck,
+  Landmark,
+  ArrowUpRight,
+  Calculator,
+} from 'lucide-react';
 import { heroStats, heroNotifications } from '../data/loanData';
+import {
+  GoldButton,
+  GhostButton,
+  Magnetic,
+  Counter,
+  LineReveal,
+  Marquee,
+  Reveal,
+} from './ui/Primitives';
+import { scrollToId } from '../lib/scroll';
 
-const notifIcons = {
-  Home: Home,
-  RefreshCw: RefreshCw,
-  BadgeCheck: BadgeCheck,
-  Landmark: Landmark,
-};
+const notifIcons = { Home, RefreshCw, BadgeCheck, Landmark };
 
-function CounterItem({ stat }) {
-  const [count, setCount] = useState(0);
-  const elementRef = useRef(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
+const tickerItems = [
+  '0% Customer Fees',
+  '270+ Institutional Partners',
+  'Pan-India Case Processing',
+  'Since 2012',
+  '₹10,000 Cr+ Facilitated',
+  'CIBIL Profile Guidance',
+  'Home Loan Balance Transfer',
+];
 
-  useEffect(() => {
+function StatCell({ stat }) {
+  const renderValue = () => {
     if (stat.isCibil) {
-      setHasAnimated(true);
-      return;
+      return <span className="font-display text-4xl text-navy-800 lg:text-[2.6rem]">CIBIL</span>;
     }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-
-          if (stat.isYear) {
-            let start = 1990;
-            const end = stat.targetNumber;
-            const duration = 1500;
-            const stepTime = 30;
-            const steps = duration / stepTime;
-            const increment = (end - start) / steps;
-
-            const timer = setInterval(() => {
-              start += increment;
-              if (start >= end) {
-                setCount(end);
-                clearInterval(timer);
-              } else {
-                setCount(Math.floor(start));
-              }
-            }, stepTime);
-          } else {
-            let start = 0;
-            const end = stat.targetNumber;
-            const duration = 1600;
-            const stepTime = 35;
-            const steps = duration / stepTime;
-            const increment = end / steps;
-
-            const timer = setInterval(() => {
-              start += increment;
-              if (start >= end) {
-                setCount(end);
-                clearInterval(timer);
-              } else {
-                setCount(Math.floor(start));
-              }
-            }, stepTime);
-          }
-        }
-      },
-      { threshold: 0.2 }
+    if (stat.isYear) {
+      return (
+        <span className="font-display text-4xl text-navy-800 lg:text-[2.6rem]">
+          Since <Counter from={1990} to={2012} duration={1.8} grouping={false} />
+        </span>
+      );
+    }
+    return (
+      <span className="flex flex-wrap items-baseline gap-x-2">
+        <span className="font-display text-4xl text-navy-800 lg:text-[2.6rem]">
+          {stat.prefix || ''}
+          <Counter to={stat.targetNumber} duration={2.2} />
+        </span>
+        {stat.suffix && (
+          <span className="font-display text-lg text-gold-600 lg:text-2xl">{stat.suffix.trim()}</span>
+        )}
+      </span>
     );
-
-    if (elementRef.current) {
-      observer.observe(elementRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [hasAnimated, stat]);
-
-  const displayValue = () => {
-    if (stat.isCibil) return "CIBIL";
-    if (!hasAnimated) return stat.value;
-    if (stat.isYear) return `Since ${count}`;
-    if (stat.prefix) return `${stat.prefix}${count.toLocaleString('en-IN')}${stat.suffix || ''}`;
-    return `${count.toLocaleString('en-IN')}${stat.suffix || ''}`;
   };
 
   return (
-    <div
-      ref={elementRef}
-      className="p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-amber-400/40 hover:bg-white/10 transition-all duration-300 group shadow-lg flex flex-col justify-between"
-    >
-      <div>
-        <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-heading tracking-tight flex items-baseline gap-1 group-hover:scale-105 transition-transform origin-left">
-          <span className="text-gradient-gold">{displayValue()}</span>
-        </div>
-        <div className="text-sm font-semibold text-slate-200 mt-1">
-          {stat.label}
-        </div>
+    <div className="px-2 py-2 lg:px-8">
+      {renderValue()}
+      <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
+        {stat.label}
       </div>
-      <div className="text-xs text-slate-400 mt-2">
-        {stat.subtext}
-      </div>
+      <p className="mt-2 text-xs leading-relaxed text-ink-muted/80">{stat.subtext}</p>
     </div>
   );
 }
@@ -103,7 +73,6 @@ function CounterItem({ stat }) {
 export default function Hero() {
   const [activeNotifIndex, setActiveNotifIndex] = useState(0);
 
-  // Rotating notification carousel (Requirement 21)
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveNotifIndex((prev) => (prev + 1) % heroNotifications.length);
@@ -111,210 +80,225 @@ export default function Hero() {
     return () => clearInterval(timer);
   }, []);
 
-  const scrollToSection = (id) => {
-    const el = document.getElementById(id);
-    if (el) {
-      const topOffset = 80;
-      const elementPosition = el.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - topOffset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
-
   const currentNotif = heroNotifications[activeNotifIndex];
   const CurrentIcon = notifIcons[currentNotif.icon] || Home;
 
   return (
-    <section id="home" className="relative min-h-[92vh] flex items-center justify-center bg-gradient-to-b from-navy-950 via-navy-900 to-navy-950 overflow-hidden pt-12 pb-20 text-white">
-      {/* Background ambient lighting */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-royal-600/20 rounded-full blur-[120px] animate-pulse-glow" />
-        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-amber-500/15 rounded-full blur-[140px]" />
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-royal-500/10 rounded-full blur-[100px]" />
-      </div>
+    <section id="home" className="relative overflow-hidden">
+      {/* ---------- Ambient — one soft wash only ---------- */}
+      <div className="pointer-events-none absolute -top-40 right-[-6%] h-[520px] w-[520px] rounded-full bg-gold-400/[0.1] blur-[160px]" />
 
-      {/* Subtle grid pattern overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center pt-4">
-          
-          {/* Left Column: Headlines & CTAs */}
-          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            {/* Top Rotating Finance Notification Carousel (Requirement 20 & 21) */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-royal-900/80 border border-royal-500/50 backdrop-blur-md shadow-inner max-w-full">
-              <span className="flex h-2.5 w-2.5 rounded-full bg-amber-400 animate-ping shrink-0" />
-              <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-amber-300 transition-all duration-300">
-                <CurrentIcon className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="font-bold text-white">{currentNotif.title}:</span>
-                <span className="text-amber-200 hidden sm:inline">{currentNotif.description}</span>
-                <span className="text-amber-200 sm:hidden">Tap to explore</span>
-              </div>
+      <div className="relative z-10 mx-auto max-w-7xl px-6 pb-4 pt-14 sm:pt-16 lg:px-8 lg:pt-20">
+        <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-10">
+          {/* ---------------- Left: copy ---------------- */}
+          <div className="lg:col-span-7">
+            {/* Rotating notification */}
+            <div
+              className="anim-rise inline-flex max-w-full items-center gap-3 rounded-full border border-ink/[0.07] bg-white/70 px-4 py-2 shadow-soft backdrop-blur"
+              style={{ animationDelay: '0.1s' }}
+            >
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold-500 opacity-60" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-gold-500" />
+              </span>
+              <span
+                key={activeNotifIndex}
+                className="anim-fade flex items-center gap-2 overflow-hidden font-mono text-[11px] tracking-wide text-ink-soft"
+              >
+                <CurrentIcon className="h-3.5 w-3.5 shrink-0 text-gold-600" />
+                <span className="font-semibold text-ink">{currentNotif.title}</span>
+                <span className="hidden text-ink-muted md:inline">— {currentNotif.description}</span>
+              </span>
             </div>
 
-            {/* Main H1 */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white font-heading tracking-tight leading-[1.12]">
-              Empowering Your Dreams,{' '}
-              <span className="text-gradient-gold block sm:inline">
-                Financing Your Future.
-              </span>
+            {/* Headline */}
+            <h1 className="display-xl mt-7 text-[2.6rem] text-ink sm:text-6xl lg:text-[4.35rem] xl:text-[4.8rem]">
+              <LineReveal inView={false} delay={0.22}>
+                Empowering Your Dreams,
+              </LineReveal>
+              <LineReveal inView={false} delay={0.36}>
+                <em className="text-gradient-gold not-italic sm:italic">Financing</em> Your Future.
+              </LineReveal>
             </h1>
 
-            {/* Supporting Text */}
-            <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-              Professional loan consulting and institutional financing solutions with <span className="text-amber-400 font-semibold underline decoration-amber-400/50 underline-offset-4">0% customer fees</span>, helping borrowers identify suitable bank rates across an extensive network of <span className="text-white font-semibold">270+ banking and financial institutions</span>.
+            {/* Lede */}
+            <p
+              className="anim-rise mt-7 max-w-xl leading-relaxed text-ink-soft"
+              style={{ animationDelay: '0.52s' }}
+            >
+              Professional loan consulting and institutional financing solutions with{' '}
+              <span className="font-semibold text-gold-700">0% customer fees</span>, connecting you
+              to suitable bank rates across a network of{' '}
+              <span className="font-semibold text-navy-800">270+ banking &amp; financial institutions</span>.
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-              <button
-                type="button"
-                onClick={() => scrollToSection('contact')}
-                className="w-full sm:w-auto px-7 py-3.5 rounded-xl font-bold text-navy-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 shadow-glow-gold transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2 group text-base"
-              >
-                <span>Get Free Consultation</span>
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => scrollToSection('balance-transfer')}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-semibold text-white bg-white/10 hover:bg-white/15 border border-white/15 hover:border-royal-400/60 backdrop-blur-md transition-all duration-300 flex items-center justify-center gap-2 text-base"
-              >
-                <span>Explore Balance Transfer</span>
-                <ChevronRight className="w-4 h-4 text-slate-400" />
-              </button>
+            <div
+              className="anim-rise mt-9 flex flex-col items-start gap-4 sm:flex-row sm:items-center"
+              style={{ animationDelay: '0.64s' }}
+            >
+              <Magnetic>
+                <GoldButton onClick={() => scrollToId('contact')}>Get Free Consultation</GoldButton>
+              </Magnetic>
+              <GhostButton tone="light" onClick={() => scrollToId('balance-transfer')}>
+                Explore Balance Transfer
+              </GhostButton>
             </div>
 
-            {/* Feature Badges */}
-            <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-slate-400">
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>100% Free For Applicants</span>
-              </div>
-              <div className="w-1 h-1 rounded-full bg-slate-600 hidden sm:block" />
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Pan-India Case Processing</span>
-              </div>
-              <div className="w-1 h-1 rounded-full bg-slate-600 hidden sm:block" />
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>CIBIL Profile Guidance</span>
-              </div>
+            {/* Assurances */}
+            <div
+              className="anim-rise mt-10 flex flex-wrap items-center gap-x-7 gap-y-3"
+              style={{ animationDelay: '0.8s' }}
+            >
+              {['100% Free For Applicants', 'Pan-India Case Processing', 'CIBIL Profile Guidance'].map(
+                (item, i) => (
+                  <span
+                    key={item}
+                    className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-ink-muted"
+                  >
+                    <CheckCircle2
+                      className={`h-3.5 w-3.5 ${i === 2 ? 'text-gold-600' : 'text-emerald-600'}`}
+                    />
+                    {item}
+                  </span>
+                )
+              )}
             </div>
           </div>
 
-          {/* Right Column: Hero Visual Graphic with Snapshot & Floating Notification Pills */}
-          <div className="lg:col-span-5 relative flex items-center justify-center">
-            {/* Ambient circle glow */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-royal-600/30 via-royal-500/10 to-amber-400/20 rounded-3xl blur-2xl -z-10" />
+          {/* ---------------- Right: advisory card ---------------- */}
+          <div className="relative lg:col-span-5">
+            <div className="anim-rise relative lg:pl-8" style={{ animationDelay: '0.45s' }}>
+              <div className="relative rounded-[24px] border border-ink/[0.06] bg-white p-6 shadow-soft sm:p-8">
+                {/* Header */}
+                <div className="flex items-center justify-between gap-4 pb-6">
+                  <div className="flex items-center gap-3.5">
+                    <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-white p-1 ring-1 ring-ink/[0.06]">
+                      <img src="/logo.png" alt="Siyaram Loans" className="h-full w-full object-contain" />
+                    </div>
+                    <div>
+                      <div className="font-display text-base text-ink">Advisory Desk</div>
+                      <div className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
+                        Ramesh Sawant · Banker
+                      </div>
+                    </div>
+                  </div>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold-700">
+                    0% Fees
+                  </span>
+                </div>
 
-            <div className="w-full max-w-md bg-gradient-to-b from-navy-800/90 to-navy-900/95 rounded-3xl p-6 sm:p-7 border border-royal-500/30 backdrop-blur-xl shadow-2xl relative">
-              
-              {/* Card Header */}
-              <div className="flex items-center justify-between border-b border-navy-700/80 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-white p-1 flex items-center justify-center text-amber-400 shrink-0 shadow-md">
-                    <img
-                      src="/logo.png"
-                      alt="Siyaram Loans Logo"
-                      className="w-full h-full object-contain"
+                {/* Benchmark */}
+                <div className="border-t border-ink/[0.07] pt-6">
+                  <div className="flex items-baseline justify-between">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
+                      Balance Transfer Benchmark
+                    </span>
+                    <span className="font-mono text-[10px] text-gold-700">7.00% Target</span>
+                  </div>
+                  <div className="mt-4 flex items-baseline gap-3">
+                    <span className="font-mono text-lg text-ink-muted/70 line-through">9.00%</span>
+                    <ArrowUpRight className="h-4 w-4 -rotate-45 text-ink-muted/40" />
+                    <span className="font-display text-4xl text-ink">7.00%</span>
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+                      ROI p.a.
+                    </span>
+                  </div>
+                  <div className="mt-5 h-px w-full bg-ink/[0.08]">
+                    <div
+                      className="anim-grow h-px w-[70%] origin-left bg-gold-500"
+                      style={{ animationDelay: '1s' }}
                     />
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
-                      <span>Siyaram Advisory Desk</span>
-                    </h3>
-                    <p className="text-[11px] text-amber-300 font-medium">Ramesh Sawant, Banker</p>
-                  </div>
-                </div>
-                <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold">
-                  0% Client Fees
-                </span>
-              </div>
-
-              {/* Main Snapshot */}
-              <div className="my-5 p-4 rounded-2xl bg-navy-950/70 border border-navy-700/60 space-y-3">
-                <div className="flex items-center justify-between text-xs text-slate-300">
-                  <span>Balance Transfer Benchmark</span>
-                  <span className="text-amber-400 font-bold">Starting from 7.00% Bank Rate</span>
-                </div>
-                <div className="h-2 w-full bg-navy-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-amber-400 to-emerald-400 rounded-full w-[78%]" />
-                </div>
-                <div className="flex justify-between items-center text-[11px] text-slate-400">
-                  <span>Current Bank Rate: 9.00%</span>
-                  <span className="text-emerald-400 font-medium">Potential 2.00% Spread</span>
-                </div>
-              </div>
-
-              {/* Supporting UI Elements (Requirement 20 & 21) */}
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-royal-400/40 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
-                    <TrendingDown className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold text-white">Personal Loan Balance Transfer</div>
-                    <div className="text-[11px] text-slate-400 truncate">Lower ROI → Potentially Lower EMI</div>
+                  <div className="mt-3 flex items-center justify-between font-mono text-[10px] text-ink-muted">
+                    <span>Current Bank Rate</span>
+                    <span className="text-emerald-700">Potential 2.00% Spread</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-royal-400/40 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-royal-400/10 border border-royal-400/30 flex items-center justify-center text-royal-400 shrink-0">
-                    <Building className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold text-white">270+ Institutional Network</div>
-                    <div className="text-[11px] text-slate-400 truncate">Government + Private Institutions</div>
-                  </div>
+                {/* Rows */}
+                <div className="mt-6 border-t border-ink/[0.07]">
+                  {[
+                    {
+                      icon: TrendingDown,
+                      title: 'Personal Loan Balance Transfer',
+                      sub: 'Lower ROI → Potentially Lower EMI',
+                    },
+                    {
+                      icon: Building,
+                      title: '270+ Institutional Network',
+                      sub: 'Government + Private Institutions',
+                    },
+                    {
+                      icon: BadgeCheck,
+                      title: 'CIBIL Cases Handled',
+                      sub: 'Subject to lender policies & eligibility',
+                    },
+                  ].map((row) => (
+                    <div
+                      key={row.title}
+                      className="group flex items-center gap-4 border-b border-ink/[0.06] py-4 last:border-b-0"
+                    >
+                      <row.icon className="h-4 w-4 shrink-0 text-gold-600" strokeWidth={1.75} />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[13px] font-medium text-ink">{row.title}</div>
+                        <div className="mt-0.5 truncate text-xs text-ink-muted">{row.sub}</div>
+                      </div>
+                      <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-ink-muted/40 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-gold-600" />
+                    </div>
+                  ))}
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-royal-400/40 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-400/10 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0">
-                    <BadgeCheck className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold text-white">CIBIL Cases Handled</div>
-                    <div className="text-[11px] text-slate-400 truncate">Loan profile assistance available</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Quick Action */}
-              <div className="mt-5 pt-4 border-t border-navy-700/80">
+                {/* Card CTA */}
                 <button
                   type="button"
-                  onClick={() => scrollToSection('savings-calculator')}
-                  className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-slate-200 hover:text-white bg-royal-800/40 hover:bg-royal-700/50 border border-royal-500/30 transition-all flex items-center justify-center gap-1.5"
+                  onClick={() => scrollToId('savings-calculator')}
+                  className="group mt-6 flex w-full items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted transition-colors duration-300 hover:text-gold-700"
                 >
-                  <span>Calculate Potential Savings</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="flex items-center gap-2">
+                    <Calculator className="h-3.5 w-3.5" />
+                    Calculate Potential Savings
+                  </span>
+                  <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </button>
               </div>
 
-              {/* Decorative floating badge */}
-              <div className="absolute -bottom-5 -right-3 sm:-right-5 bg-gradient-to-r from-amber-500 to-yellow-400 text-navy-950 px-3.5 py-1.5 rounded-xl shadow-xl font-bold text-xs flex items-center gap-1.5 border border-amber-300">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Since 2012</span>
-              </div>
+              <p className="mt-4 text-right font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
+                Since 2012 · 270+ Bank Partners
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Bottom Trust Indicators Grid with Animated Counters + CIBIL (Requirement 14) */}
-        <div className="mt-16 sm:mt-20 pt-8 border-t border-navy-800/80">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
-            {heroStats.map((stat, idx) => (
-              <CounterItem key={idx} stat={stat} />
+        {/* ---------------- Stats strip ---------------- */}
+        <Reveal className="mt-20 lg:mt-24" y={36}>
+          <div className="grid grid-cols-2 gap-y-10 sm:grid-cols-3 lg:grid-cols-5 lg:gap-y-0 lg:divide-x lg:divide-ink/[0.08]">
+            {heroStats.map((stat) => (
+              <StatCell key={stat.label} stat={stat} />
             ))}
           </div>
+        </Reveal>
+      </div>
+
+      {/* ---------------- Ticker (no borders — soft tint band) ---------------- */}
+      <div className="relative z-10 mt-16">
+        <div className="mx-2 rounded-[2rem] bg-white/60 py-4 shadow-soft ring-1 ring-ink/[0.04] backdrop-blur sm:mx-4 sm:rounded-[3rem] lg:mx-6">
+          <Marquee className="mask-fade-x">
+            {tickerItems.map((item) => (
+              <span
+                key={item}
+                className="mx-7 flex items-center gap-7 font-mono text-[10px] uppercase tracking-widest2 text-ink-muted"
+              >
+                {item}
+                <span className="text-gold-500">✦</span>
+              </span>
+            ))}
+          </Marquee>
         </div>
       </div>
+
+      {/* breathing room for the next sheet's overlap */}
+      <div className="h-12 sm:h-16" />
     </section>
   );
 }

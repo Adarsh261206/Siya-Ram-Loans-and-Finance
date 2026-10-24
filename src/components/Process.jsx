@@ -1,100 +1,78 @@
 import React from 'react';
-import { MessageSquare, FileSearch, GitCompare, CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { MessageSquare, FileSearch, GitCompare, CheckCircle } from 'lucide-react';
 import { processSteps } from '../data/loanData';
+import { SectionHeading, Reveal, Stagger, StaggerItem, GoldButton, EASE } from './ui/Primitives';
+import { scrollToId } from '../lib/scroll';
 
-const stepIcons = {
-  MessageSquare: MessageSquare,
-  FileSearch: FileSearch,
-  GitCompare: GitCompare,
-  CheckCircle: CheckCircle,
-};
+const stepIcons = { MessageSquare, FileSearch, GitCompare, CheckCircle };
 
 export default function Process() {
   return (
-    <section className="py-20 bg-navy-950 text-white relative overflow-hidden border-b border-navy-800">
-      {/* Background glow */}
-      <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-royal-700/15 rounded-full blur-[140px] pointer-events-none" />
+    <section className="relative overflow-hidden">
+      <div className="relative z-10 mx-auto max-w-7xl px-6 py-24 sm:py-28 lg:px-8 lg:py-36">
+        <SectionHeading
+          tone="light"
+          align="center"
+          eyebrow="Simple 4-Step Journey"
+          number="07"
+          title={
+            <>
+              Simple <em className="text-gradient-gold italic">Application Process</em>
+            </>
+          }
+          lede="From your initial query to institutional sanction — an efficient, structured and completely hassle-free process."
+          className="max-w-3xl"
+        />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-royal-800/50 border border-royal-500/30 text-royal-300 text-xs sm:text-sm font-semibold mb-4 tracking-wide uppercase">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            Simple 4-Step Journey
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white font-heading tracking-tight">
-            Simple <span className="text-gradient-gold">Application Process</span>
-          </h2>
-          <p className="mt-4 text-base sm:text-lg text-slate-300 leading-relaxed font-normal">
-            From your initial query to institutional sanction, experience an efficient, structured, and completely hassle-free process.
-          </p>
-        </div>
+        <div className="relative mt-20">
+          {/* Track */}
+          <div className="absolute left-0 right-0 top-6 hidden h-px bg-ink/10 lg:block" />
+          <motion.div
+            className="absolute left-0 top-6 hidden h-px bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500 lg:block"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 1.8, ease: EASE, delay: 0.2 }}
+            style={{ transformOrigin: 'left', width: '100%' }}
+          />
 
-        {/* 4 Steps Horizontal Flow */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 relative">
-          {processSteps.map((step, idx) => {
-            const IconComp = stepIcons[step.icon] || MessageSquare;
-            const isLast = idx === processSteps.length - 1;
+          <Stagger className="grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-0" gap={0.14}>
+            {processSteps.map((step) => {
+              const Icon = stepIcons[step.icon] || MessageSquare;
+              return (
+                <StaggerItem key={step.step}>
+                  <div className="group relative lg:pr-10">
+                    {/* Node */}
+                    <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-gold-500/50 bg-white font-mono text-xs font-bold text-gold-700 shadow-soft transition-all duration-500 group-hover:border-gold-500 group-hover:shadow-gold-soft">
+                      {step.step}
+                    </div>
 
-            return (
-              <div key={step.step} className="relative group">
-                <div className="h-full rounded-2xl p-7 bg-navy-900/90 border border-navy-700/80 hover:border-amber-400/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-card-hover flex flex-col justify-between">
-                  <div>
-                    {/* Step indicator header */}
-                    <div className="flex items-center justify-between mb-5">
-                      <div className="w-12 h-12 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400 font-extrabold text-base group-hover:scale-105 group-hover:bg-amber-400/20 transition-all">
-                        {step.step}
-                      </div>
-                      <span className="text-xs font-semibold text-slate-400 px-2.5 py-1 rounded-full bg-white/5 border border-white/5">
+                    <div className="mt-7 flex items-center gap-3">
+                      <Icon className="h-4 w-4 text-ink-muted transition-colors duration-300 group-hover:text-gold-700" />
+                      <span className="rounded-full border border-ink/[0.08] bg-white/70 px-2.5 py-1 font-mono text-[9px] uppercase tracking-widest2 text-ink-muted">
                         {step.duration}
                       </span>
                     </div>
 
-                    {/* Step Icon */}
-                    <div className="w-10 h-10 rounded-lg bg-royal-600/20 text-royal-400 flex items-center justify-center mb-4 group-hover:text-amber-300 transition-colors">
-                      <IconComp className="w-5 h-5" />
-                    </div>
-
-                    {/* Step Title */}
-                    <h3 className="text-lg font-bold text-white mb-2.5 group-hover:text-amber-300 transition-colors">
+                    <h3 className="mt-4 font-display text-xl text-ink transition-colors duration-300 group-hover:text-navy-800">
                       {step.title}
                     </h3>
-
-                    {/* Step Description */}
-                    <p className="text-sm text-slate-300 leading-relaxed font-normal">
+                    <p className="mt-2.5 max-w-xs text-sm leading-relaxed text-ink-soft">
                       {step.description}
                     </p>
                   </div>
-
-                  <div className="mt-6 pt-3 border-t border-navy-800 flex items-center gap-1.5 text-xs text-amber-400/90 font-medium">
-                    <span>Phase 0{idx + 1}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </div>
-                </div>
-
-                {/* Arrow connector between steps on desktop */}
-                {!isLast && (
-                  <div className="hidden lg:flex absolute top-1/2 -right-4 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-navy-800 border border-navy-600 text-amber-400 items-center justify-center shadow-md">
-                    <ArrowRight className="w-4 h-4" />
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                </StaggerItem>
+              );
+            })}
+          </Stagger>
         </div>
 
-        {/* CTA Banner */}
-        <div className="mt-14 text-center">
-          <a
-            href="#contact"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-navy-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 shadow-glow-gold transition-all duration-300 hover:scale-105"
-          >
-            <span>Start Step 1: Share Your Requirement</span>
-            <ArrowRight className="w-5 h-5" />
-          </a>
-        </div>
-
+        <Reveal className="mt-20 text-center" y={26}>
+          <GoldButton onClick={() => scrollToId('contact')}>
+            Start Step 1 — Share Your Requirement
+          </GoldButton>
+        </Reveal>
       </div>
     </section>
   );

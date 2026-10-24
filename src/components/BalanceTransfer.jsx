@@ -1,232 +1,271 @@
 import React from 'react';
-import { Home, RefreshCw, CheckCircle2, ArrowRight, TrendingDown, Percent, Sparkles, ShieldCheck, Calculator, AlertCircle, ArrowDownRight, Layers } from 'lucide-react';
+import { motion } from 'framer-motion';
+import {
+  Home,
+  RefreshCw,
+  CheckCircle2,
+  TrendingDown,
+  ShieldCheck,
+  Calculator,
+} from 'lucide-react';
 import { balanceTransferOptions, personalLoanExample } from '../data/loanData';
+import {
+  SectionHeading,
+  Reveal,
+  Stagger,
+  StaggerItem,
+  GoldButton,
+  GhostButton,
+  LineReveal,
+} from './ui/Primitives';
+import { scrollToId } from '../lib/scroll';
 
 export default function BalanceTransfer({ onSelectLoan }) {
   const handleSelect = (category) => {
-    if (onSelectLoan) {
-      onSelectLoan(category);
-    }
-    const target = document.getElementById('contact');
-    if (target) {
-      const topOffset = 80;
-      const elementPosition = target.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - topOffset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
-
-  const scrollToCalculator = () => {
-    const target = document.getElementById('savings-calculator');
-    if (target) {
-      const topOffset = 80;
-      const elementPosition = target.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - topOffset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
+    if (onSelectLoan) onSelectLoan(category);
+    scrollToId('contact');
   };
 
   return (
-    <section id="balance-transfer" className="py-20 bg-navy-950 text-white relative overflow-hidden border-b border-navy-800">
-      {/* Decorative background lighting */}
-      <div className="absolute top-1/4 -right-20 w-96 h-96 bg-royal-600/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-amber-500/10 rounded-full blur-[140px] pointer-events-none" />
+    <section id="balance-transfer" className="relative overflow-hidden text-ink">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-royal-800/60 border border-royal-500/40 text-amber-300 text-xs sm:text-sm font-semibold mb-4 tracking-wide uppercase">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            Core Balance Transfer Specialization
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white font-heading tracking-tight">
-            Strategic <span className="text-gradient-gold">Balance Transfer</span> Solutions
-          </h2>
-          <p className="mt-3 text-lg sm:text-xl font-semibold text-royal-300 font-heading">
-            Optimize Your Existing Liabilities & Expand Monthly Cash Flow
-          </p>
-          <p className="mt-2 text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
-            Transfer your ongoing liability to premier banking and financial institutions with competitive interest rate benchmarks and 0% customer fees.
-          </p>
-        </div>
+      <div className="relative z-10 mx-auto max-w-7xl px-6 py-24 sm:py-28 lg:px-8 lg:py-36">
+        <SectionHeading
+          tone="light"
+          align="center"
+          eyebrow="Core Balance Transfer Specialization"
+          number="03"
+          title={
+            <LineReveal delay={0.05}>
+              Strategic <em className="text-gradient-gold italic">Balance Transfer</em> Solutions
+            </LineReveal>
+          }
+          lede="Optimize your existing liabilities and expand monthly cash flow. Transfer ongoing loans to premier banking and financial institutions with competitive interest-rate benchmarks — at 0% customer fees."
+          className="max-w-3xl"
+        />
 
-        {/* Two Major Highlighted Balance Transfer Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        {/* Cards */}
+        <Stagger className="mx-auto mt-16 grid max-w-6xl grid-cols-1 gap-8 lg:grid-cols-2" gap={0.15}>
           {balanceTransferOptions.map((opt) => {
             const isHome = opt.id === 'home-loan';
-
             return (
-              <div
-                key={opt.id}
-                className="group relative rounded-3xl p-7 sm:p-9 bg-gradient-to-b from-navy-900/90 to-navy-950/95 border border-royal-500/30 hover:border-amber-400/60 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl flex flex-col justify-between"
-              >
-                {/* Top subtle highlight gradient */}
-                <div className={`absolute top-0 left-0 right-0 h-1.5 rounded-t-3xl transition-opacity ${
-                  isHome ? 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500' : 'bg-gradient-to-r from-emerald-400 via-teal-400 to-royal-500'
-                }`} />
+              <StaggerItem key={opt.id}>
+                <motion.div
+                  whileHover={{ y: -6 }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  className={
+                    isHome
+                      ? 'relative flex h-full flex-col overflow-hidden rounded-[28px] bg-gradient-to-b from-navy-800 to-navy-900 text-white shadow-lift'
+                      : 'relative flex h-full flex-col overflow-hidden rounded-[28px] border border-ink/[0.08] bg-[#FBF7EC] text-ink shadow-lift-light'
+                  }
+                >
+                  {/* Top accent */}
+                  <div
+                    className={`h-1 w-full bg-gradient-to-r ${
+                      isHome ? 'from-gold-500 via-gold-300 to-gold-500' : 'from-navy-700 via-navy-400 to-navy-700'
+                    }`}
+                  />
 
-                <div>
-                  {/* Top Bar with Badge */}
-                  <div className="flex items-center justify-between gap-4 mb-5">
-                    <div className="flex items-center gap-3.5">
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-md ${
-                        isHome
-                          ? 'bg-amber-500/20 text-amber-400 border border-amber-400/30 group-hover:bg-amber-400/30'
-                          : 'bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 group-hover:bg-emerald-400/30'
-                      }`}>
-                        {isHome ? <Home className="w-7 h-7" /> : <RefreshCw className="w-7 h-7" />}
+                  <div className="flex flex-1 flex-col p-7 sm:p-9">
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${
+                            isHome
+                              ? 'border-gold-400/30 bg-gold-400/10 text-gold-300'
+                              : 'border-navy-800/15 bg-navy-800/[0.06] text-navy-800'
+                          }`}
+                        >
+                          {isHome ? <Home className="h-6 w-6" /> : <RefreshCw className="h-6 w-6" />}
+                        </div>
+                        <div>
+                          <div
+                            className={`font-mono text-[9px] uppercase tracking-widest2 ${
+                              isHome ? 'text-gold-400' : 'text-gold-700'
+                            }`}
+                          >
+                            {isHome ? 'Mortgage Refinancing' : 'Debt Optimization'}
+                          </div>
+                          <h3 className="mt-1.5 font-display text-2xl leading-tight sm:text-[1.7rem]">
+                            {opt.title}
+                          </h3>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-                          {isHome ? 'Mortgage Refinancing' : 'Debt Optimization'}
-                        </span>
-                        <h3 className="text-xl sm:text-2xl font-extrabold text-white font-heading">{opt.title}</h3>
-                      </div>
+                      <span
+                        className={`shrink-0 font-mono text-[9px] uppercase tracking-[0.2em] ${
+                          isHome ? 'text-gold-300/80' : 'text-ink-muted'
+                        }`}
+                      >
+                        {opt.badge}
+                      </span>
                     </div>
 
-                    <span className="shrink-0 px-3 py-1 rounded-full text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                      {opt.badge}
-                    </span>
-                  </div>
-
-                  {/* Subtitle & Marketing Message */}
-                  <div className="mb-5">
-                    <div className="text-sm font-semibold text-royal-200 font-heading">
+                    {/* Subtitle */}
+                    <p className={`mt-6 text-sm font-medium ${isHome ? 'text-slate-300' : 'text-ink-soft'}`}>
                       {opt.subtitle}
-                    </div>
-                    <div className="text-xs font-bold text-amber-400 mt-1 uppercase tracking-wide">
+                    </p>
+                    <p
+                      className={`mt-1.5 font-mono text-[10px] uppercase tracking-widest2 ${
+                        isHome ? 'text-gold-300' : 'text-gold-700'
+                      }`}
+                    >
                       {opt.marketingMessage}
-                    </div>
-                  </div>
+                    </p>
 
-                  {/* Highlight Institutional Baseline Banner */}
-                  <div className="p-4 rounded-2xl bg-navy-950/90 border border-navy-700/80 mb-6 flex items-center justify-between">
-                    <div>
-                      <div className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Institutional Baseline</div>
-                      <div className="text-base sm:text-lg font-black text-amber-400 font-heading mt-0.5">
+                    {/* Baseline */}
+                    <div
+                      className={`mt-7 border-t pt-5 ${
+                        isHome ? 'border-white/10' : 'border-ink/[0.08]'
+                      }`}
+                    >
+                      <div
+                        className={`font-mono text-[9px] uppercase tracking-[0.2em] ${
+                          isHome ? 'text-slate-500' : 'text-ink-muted'
+                        }`}
+                      >
+                        Institutional Baseline
+                      </div>
+                      <div
+                        className={`mt-1.5 font-display text-xl ${
+                          isHome ? 'text-gold-300' : 'text-navy-800'
+                        }`}
+                      >
                         {opt.highlight}
                       </div>
                     </div>
-                    <div className="w-9 h-9 rounded-xl bg-amber-400/10 flex items-center justify-center text-amber-400 font-bold text-sm">
-                      <Percent className="w-4 h-4" />
+
+                    {/* Benefits */}
+                    <div className="mt-7 flex-1">
+                      <div
+                        className={`font-mono text-[9px] uppercase tracking-widest2 ${
+                          isHome ? 'text-slate-500' : 'text-ink-muted'
+                        }`}
+                      >
+                        Key Client Benefits
+                      </div>
+                      <ul className="mt-4 space-y-3">
+                        {opt.points.map((pt) => (
+                          <li key={pt} className="flex items-start gap-3">
+                            <CheckCircle2
+                              className={`mt-0.5 h-4 w-4 shrink-0 ${
+                                isHome ? 'text-emerald-400' : 'text-emerald-600'
+                              }`}
+                            />
+                            <span
+                              className={`text-sm leading-relaxed ${
+                                isHome ? 'text-slate-300' : 'text-ink-soft'
+                              }`}
+                            >
+                              {pt}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* CTAs */}
+                    <div
+                      className={`mt-8 space-y-3 border-t pt-6 ${
+                        isHome ? 'border-white/10' : 'border-ink/10'
+                      }`}
+                    >
+                      <GoldButton
+                        className="w-full"
+                        onClick={() => handleSelect(opt.category)}
+                      >
+                        {opt.ctaText}
+                      </GoldButton>
+                      <GhostButton
+                        tone={isHome ? 'dark' : 'light'}
+                        className="w-full"
+                        onClick={() => scrollToId('savings-calculator')}
+                      >
+                        <Calculator className="mr-1 inline h-3.5 w-3.5" />
+                        {opt.calculatorCta}
+                      </GhostButton>
                     </div>
                   </div>
-
-                  {/* Key Benefits */}
-                  <div className="mb-6">
-                    <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-                      Key Client Benefits:
-                    </div>
-                    <ul className="space-y-3">
-                      {opt.points.map((pt, idx) => (
-                        <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-300 leading-relaxed">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                          <span>{pt}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                {/* CTAs (Primary & Secondary as per Requirement 4) */}
-                <div className="pt-4 border-t border-navy-800 space-y-2.5">
-                  <button
-                    type="button"
-                    onClick={() => handleSelect(opt.category)}
-                    className={`w-full py-3.5 px-5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-lg ${
-                      isHome
-                        ? 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-navy-950 shadow-glow-gold'
-                        : 'bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-navy-950 shadow-md font-extrabold'
-                    }`}
-                  >
-                    <span>{opt.ctaText}</span>
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={scrollToCalculator}
-                    className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-royal-400/50 transition-all flex items-center justify-center gap-1.5"
-                  >
-                    <Calculator className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{opt.calculatorCta}</span>
-                  </button>
-                </div>
-              </div>
+                </motion.div>
+              </StaggerItem>
             );
           })}
-        </div>
+        </Stagger>
 
-        {/* Small Example Section (Requirement 5) */}
-        <div className="mt-14 max-w-4xl mx-auto rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-navy-900 via-navy-850 to-navy-900 border border-royal-500/30 shadow-2xl">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-navy-700/80 pb-4 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-400 border border-amber-400/30 flex items-center justify-center shrink-0">
-                <TrendingDown className="w-5 h-5" />
+        {/* Example ledger */}
+        <Reveal className="mx-auto mt-20 max-w-4xl" y={40}>
+          <div className="overflow-hidden rounded-3xl border border-ink/[0.08] bg-[#FBF7EC] shadow-lift-light">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink/10 px-7 py-5 sm:px-9">
+              <div className="flex items-center gap-3.5">
+                <TrendingDown className="h-5 w-5 text-gold-600" />
+                <div>
+                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-gold-700">
+                    Illustrative Example
+                  </div>
+                  <h3 className="mt-0.5 font-display text-xl text-ink">
+                    {personalLoanExample.heading}
+                  </h3>
+                </div>
               </div>
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">Illustrative Example</span>
-                <h3 className="text-lg sm:text-xl font-extrabold text-white font-heading">
-                  {personalLoanExample.heading}
-                </h3>
+              <span className="rounded-full border border-ink/10 px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 text-ink-muted">
+                Personal Loan Transfer Scenario
+              </span>
+            </div>
+
+            <div className="grid divide-y divide-ink/10 border-b border-ink/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+              <div className="px-7 py-6">
+                <div className="font-mono text-[9px] uppercase tracking-widest2 text-ink-muted">
+                  Existing Outstanding
+                </div>
+                <div className="mt-2 font-mono text-2xl font-semibold text-ink">
+                  {personalLoanExample.outstandingAmount}
+                </div>
+                <div className="mt-1 text-[10px] text-ink-muted">Existing personal loan balance</div>
+              </div>
+              <div className="bg-red-500/[0.04] px-7 py-6">
+                <div className="font-mono text-[9px] uppercase tracking-widest2 text-red-600/80">
+                  Current ROI
+                </div>
+                <div className="mt-2 font-mono text-2xl font-semibold text-red-600">
+                  {personalLoanExample.currentROI}
+                </div>
+                <div className="mt-1 text-[10px] text-ink-muted">Typical existing rate</div>
+              </div>
+              <div className="bg-emerald-500/[0.05] px-7 py-6">
+                <div className="font-mono text-[9px] uppercase tracking-widest2 text-emerald-700/80">
+                  Potential New ROI
+                </div>
+                <div className="mt-2 font-mono text-2xl font-semibold text-emerald-700">
+                  {personalLoanExample.potentialROI}
+                </div>
+                <div className="mt-1 text-[10px] font-semibold text-emerald-700">
+                  Potential 4.00% ROI spread
+                </div>
               </div>
             </div>
-            <span className="text-xs px-3 py-1 rounded-full bg-royal-700/40 text-royal-200 border border-royal-500/30 w-fit">
-              Personal Loan Transfer Scenario
-            </span>
+
+            <div className="space-y-3 px-7 py-6 text-xs leading-relaxed text-ink-soft sm:px-9">
+              <p>
+                <strong className="text-ink">Explanation:</strong> {personalLoanExample.explanation}
+              </p>
+              <p className="text-ink-muted">
+                <strong className="text-gold-700">Important Note:</strong>{' '}
+                {personalLoanExample.disclaimer}
+              </p>
+            </div>
           </div>
+        </Reveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div className="p-4 rounded-2xl bg-navy-950/80 border border-navy-700/80">
-              <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">Existing Outstanding Loan</div>
-              <div className="text-2xl font-black text-white font-mono mt-1">
-                {personalLoanExample.outstandingAmount}
-              </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Existing Personal Loan Balance</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-navy-950/80 border border-red-500/20">
-              <div className="text-[11px] text-red-300 uppercase tracking-wider font-semibold">Current ROI</div>
-              <div className="text-2xl font-black text-red-400 font-mono mt-1">
-                {personalLoanExample.currentROI}
-              </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Typical Existing Rate</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-navy-950/80 border border-emerald-500/30">
-              <div className="text-[11px] text-emerald-300 uppercase tracking-wider font-semibold">Potential New ROI</div>
-              <div className="text-2xl font-black text-emerald-400 font-mono mt-1">
-                {personalLoanExample.potentialROI}
-              </div>
-              <div className="text-[10px] text-emerald-400/80 font-bold mt-0.5">Potential 4.00% ROI Spread</div>
-            </div>
-          </div>
-
-          <div className="space-y-2.5 text-xs text-slate-300 leading-relaxed bg-navy-950/60 p-4 rounded-xl border border-navy-800">
-            <p>
-              <strong className="text-white">Explanation:</strong> {personalLoanExample.explanation}
+        {/* Disclaimer */}
+        <Reveal className="mx-auto mt-10 max-w-3xl" y={20}>
+          <div className="flex items-start justify-center gap-2.5 text-center">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+            <p className="text-xs leading-relaxed text-ink-muted">
+              <strong className="text-ink-soft">Regulatory Disclaimer:</strong>{' '}
+              {personalLoanExample.generalDisclaimer}
             </p>
-            <p className="text-slate-400">
-              <strong className="text-amber-300">Important Note:</strong> {personalLoanExample.disclaimer}
-            </p>
           </div>
-        </div>
-
-        {/* Mandatory Financial Disclaimer (Requirement 3) */}
-        <div className="mt-8 text-center text-xs text-slate-400 max-w-3xl mx-auto flex items-start justify-center gap-2 p-3 rounded-xl bg-navy-950/50 border border-navy-800/80">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-          <p className="leading-relaxed">
-            <strong className="text-slate-300">Regulatory Disclaimer:</strong> {personalLoanExample.generalDisclaimer}
-          </p>
-        </div>
-
+        </Reveal>
       </div>
     </section>
   );
