@@ -90,6 +90,8 @@ export default function About() {
                     <motion.img
                       src="/ramesh-sawant.jpg"
                       alt="Ramesh Sawant — Proprietor, Siyaram Loans & Finance"
+                      loading="lazy"
+                      decoding="async"
                       className="aspect-[4/5] w-full object-cover object-top"
                       initial={{ scale: 1.12 }}
                       whileInView={{ scale: 1 }}

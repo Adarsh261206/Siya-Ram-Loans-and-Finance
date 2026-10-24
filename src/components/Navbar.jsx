@@ -141,7 +141,12 @@ export default function Navbar() {
             aria-label="Siyaram Loans & Finance — Home"
           >
             <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white p-1 shadow-soft ring-1 ring-ink/[0.06] transition-transform duration-500 group-hover:rotate-[6deg]">
-              <img src="/logo.png" alt="Siyaram Loans & Finance" className="h-full w-full object-contain" />
+              <img
+                src="/logo.png"
+                alt="Siyaram Loans & Finance — Loans & Finance"
+                decoding="async"
+                className="h-full w-full object-contain"
+              />
             </div>
             <div className="leading-none">
               <span className="block font-display text-lg font-semibold tracking-tight text-ink">

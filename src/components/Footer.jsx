@@ -41,7 +41,13 @@ export default function Footer() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-7 px-6 py-10 md:flex-row lg:px-8">
           <div className="flex items-center gap-4 text-center md:text-left">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-soft ring-1 ring-ink/[0.06]">
-              <img src="/logo.png" alt="Siyaram Loans & Finance" className="h-full w-full object-contain" />
+              <img
+                src="/logo.png"
+                alt="Siyaram Loans & Finance — logo"
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-contain"
+              />
             </div>
             <div>
               <span className="block font-display text-xl tracking-tight text-ink">
